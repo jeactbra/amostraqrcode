@@ -314,10 +314,10 @@ def main(page: ft.Page):
     )
 
     # ---------------- Campos BIOCHAR ----------------
-    tf_sample_name = ft.TextField(label="Nome da amostra", icon=Icons.LABEL, width=420)
-    tf_biomass     = ft.TextField(label="Biomassa", icon=Icons.ECO, width=420)
-    tf_producer    = ft.TextField(label="Quem produziu", icon=Icons.PERSON, width=260)
-    tf_reactor     = ft.TextField(label="Tipo de reator", icon=Icons.BUILD, width=260)
+    tf_sample_name = ft.TextField(label="Nome da amostra", icon=Icons.LABEL, expand=1)
+    tf_biomass     = ft.TextField(label="Biomassa", icon=Icons.ECO, expand=1)
+    tf_producer    = ft.TextField(label="Quem produziu", icon=Icons.PERSON, expand=1)
+    tf_reactor     = ft.TextField(label="Tipo de reator", icon=Icons.BUILD, expand=1)
 
     tf_prod_date   = ft.TextField(
         label="Data de produção",
@@ -333,18 +333,18 @@ def main(page: ft.Page):
     )
     tf_prod_date.suffix = ft.IconButton(icon=Icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_prod))
 
-    tf_pyroC       = ft.TextField(label="Temperatura de pirólise (°C)", icon=Icons.THERMOSTAT, width=200, keyboard_type=ft.KeyboardType.NUMBER)
-    tf_res_min     = ft.TextField(label="Tempo de residência (min)", icon=Icons.TIMER, width=200, keyboard_type=ft.KeyboardType.NUMBER)
-    tf_notes_bc    = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
+    tf_pyroC       = ft.TextField(label="Temperatura de pirólise (°C)", icon=Icons.THERMOSTAT, expand=1, keyboard_type=ft.KeyboardType.NUMBER)
+    tf_res_min     = ft.TextField(label="Tempo de residência (min)", icon=Icons.TIMER, expand=1, keyboard_type=ft.KeyboardType.NUMBER)
+    tf_notes_bc    = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, expand=1)
 
     # ---------------- Campos BIOMASS ----------------
-    tf_bm_name   = ft.TextField(label="Nome da biomassa", icon=Icons.ECO, width=420)
-    tf_origin    = ft.TextField(label="Origem", icon=Icons.LOCATION_ON, width=420)
+    tf_bm_name   = ft.TextField(label="Nome da biomassa", icon=Icons.ECO, expand=1)
+    tf_origin    = ft.TextField(label="Origem", icon=Icons.LOCATION_ON, expand=1)
 
     tf_coll_date = ft.TextField(
         label="Data de coleta",
         icon=Icons.EVENT,
-        width=260,
+        expand=1,
         read_only=True,
         hint_text="YYYY-MM-DD"
     )
@@ -355,7 +355,7 @@ def main(page: ft.Page):
     )
     tf_coll_date.suffix = ft.IconButton(icon=Icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_coll))
 
-    tf_notes_bm  = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
+    tf_notes_bm  = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, expand=1)
 
     # ---------- Prévia / Conteúdo e Zoom ----------
     img_preview = ft.Image(
@@ -366,8 +366,38 @@ def main(page: ft.Page):
         src_base64=_transparent_png_base64(),  # evita erro na 1ª renderização
     )
 
-    qr_content_out = ft.TextField(label="Conteúdo do QR", multiline=True, min_lines=10, max_lines=18, width=420)
+    preview_img_container = ft.Container(
+        content=img_preview,
+        alignment=ft.alignment.center,
+        bgcolor=Colors.WHITE,
+        padding=10,
+        border_radius=10,
+        shadow=ft.BoxShadow(
+            blur_radius=8,
+            color=ft.colors.with_opacity(0.2, Colors.BLACK),  # use ft.colors.with_opacity
+        ),
+    )
+
+    qr_content_out = ft.TextField(label="Conteúdo do QR", multiline=True, min_lines=10, max_lines=18, expand=1)
     zoom_slider = ft.Slider(min=0.5, max=1.5, divisions=10, value=1.0, label="{value}x", expand=1)
+
+    def _base_img_size():
+        return 300 if page.width and page.width < 600 else 420
+
+    def _apply_img_size():
+        base = _base_img_size()
+        factor = zoom_slider.value or 1.0
+        img_preview.width = int(base * factor)
+        img_preview.height = int(base * factor)
+
+    def on_zoom_change(e=None):
+        if not getattr(img_preview, "src_base64", None):
+            return
+        _apply_img_size()
+        page.update()
+
+    page.on_resized = lambda e: (_apply_img_size(), page.update())
+
 
     zoom_row = ft.Row(
         [
@@ -407,9 +437,8 @@ def main(page: ft.Page):
 
     def set_preview(png_bytes: bytes):
         img_preview.src_base64 = base64.b64encode(png_bytes).decode("ascii")
-        factor = zoom_slider.value or 1.0
-        img_preview.width = int(420 * factor)
-        img_preview.height = int(420 * factor)
+        _apply_img_size()
+
 
     def generate_preview(e=None):
         nonlocal current_png_bytes, current_png_name
@@ -585,11 +614,7 @@ def main(page: ft.Page):
                 ft.Row([ft.Icon(Icons.IMAGE, color=Colors.BLUE), ft.Text("Prévia", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.Container(
-                    img_preview,
-                    bgcolor=Colors.WHITE,
-                    padding=10,
-                    border_radius=10,
-                    shadow=ft.BoxShadow(blur_radius=8, color=Colors.with_opacity(0.2, Colors.BLACK)),
+                    preview_img_container,
                 ),
                 #ft.Row([ft.Icon(Icons.ZOOM_IN_MAP), ft.Text("Zoom"), zoom_slider], alignment=ft.MainAxisAlignment.START),
                 zoom_row,
@@ -598,7 +623,7 @@ def main(page: ft.Page):
                 qr_content_out
             ], tight=True),
             padding=16,
-            width=460
+            expand=1
         )
     )
 
@@ -612,17 +637,15 @@ def main(page: ft.Page):
     tab.on_change = on_tab_change
 
     # ===== Layout final: header no topo, depois conteúdo =====
-    body = ft.Row(
-        [
-            ft.Container(
-                ft.Column([tab, left_panel], spacing=12, expand=True),
-                expand=True,
-            ),
-            ft.Container(right_panel, expand=True),
+    body = ft.ResponsiveRow(
+        controls=[
+            ft.Container(ft.Column([tab, left_panel], spacing=12), col={"xs":12, "md":7}),
+            ft.Container(right_panel, col={"xs":12, "md":5}),
         ],
+        columns=12,
         spacing=16,
-        vertical_alignment=ft.CrossAxisAlignment.START,  # 🔑 força alinhamento pelo topo
     )
+
 
 
     page.add(header, body)
