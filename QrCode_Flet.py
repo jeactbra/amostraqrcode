@@ -36,6 +36,13 @@ except AttributeError:
     # fallback p/ constantes antigas; util with_opacity continua em ft.colors
     Colors = ft.colors
 
+# Compat com Flet 0.24–0.28+
+try:
+    Icons = ft.Icons      # novo enum
+except AttributeError:
+    Icons = ft.icons      # fallback
+
+
 
 # ======================== Núcleo (render e utilitários) ========================
 def _load_font(size=36):
@@ -253,7 +260,7 @@ def main(page: ft.Page):
             elevation=2,
         )
         theme_btn.icon_color = icon_col
-        theme_btn.icon = ft.icons.NIGHTLIGHT_ROUND if is_dark else ft.icons.WB_SUNNY
+        theme_btn.icon = Icons.NIGHTLIGHT_ROUND if is_dark else Icons.WB_SUNNY
 
     def toggle_theme(e):
         nonlocal is_dark
@@ -272,7 +279,7 @@ def main(page: ft.Page):
             [
                 ft.Row(
                     [
-                        ft.Icon(ft.icons.QR_CODE_2, color="white", size=30),
+                        ft.Icon(Icons.QR_CODE_2, color="white", size=30),
                         ft.Text("Gerador de Rótulos com QR", size=22, weight=ft.FontWeight.BOLD, color="white"),
                     ],
                     spacing=10,
@@ -292,8 +299,8 @@ def main(page: ft.Page):
         selected_index=0,
         animation_duration=150,
         tabs=[
-            ft.Tab(text="Biochar", icon=ft.icons.SCIENCE),
-            ft.Tab(text="Biomassa", icon=ft.icons.GRAIN),
+            ft.Tab(text="Biochar", icon=Icons.SCIENCE),
+            ft.Tab(text="Biomassa", icon=Icons.GRAIN),
         ],
         expand=0
     )
@@ -307,14 +314,14 @@ def main(page: ft.Page):
     )
 
     # ---------------- Campos BIOCHAR ----------------
-    tf_sample_name = ft.TextField(label="Nome da amostra", icon=ft.icons.LABEL, width=420)
-    tf_biomass     = ft.TextField(label="Biomassa", icon=ft.icons.ECO, width=420)
-    tf_producer    = ft.TextField(label="Quem produziu", icon=ft.icons.PERSON, width=260)
-    tf_reactor     = ft.TextField(label="Tipo de reator", icon=ft.icons.BUILD, width=260)
+    tf_sample_name = ft.TextField(label="Nome da amostra", icon=Icons.LABEL, width=420)
+    tf_biomass     = ft.TextField(label="Biomassa", icon=Icons.ECO, width=420)
+    tf_producer    = ft.TextField(label="Quem produziu", icon=Icons.PERSON, width=260)
+    tf_reactor     = ft.TextField(label="Tipo de reator", icon=Icons.BUILD, width=260)
 
     tf_prod_date   = ft.TextField(
         label="Data de produção",
-        icon=ft.icons.EVENT,
+        icon=Icons.EVENT,
         width=260,
         read_only=True,
         hint_text="YYYY-MM-DD"
@@ -324,19 +331,19 @@ def main(page: ft.Page):
         last_date=dt.date(2100,12,31),
         on_change=lambda e: (setattr(tf_prod_date, "value", str(e.control.value) or ""), page.update())
     )
-    tf_prod_date.suffix = ft.IconButton(icon=ft.icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_prod))
+    tf_prod_date.suffix = ft.IconButton(icon=Icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_prod))
 
-    tf_pyroC       = ft.TextField(label="Temperatura de pirólise (°C)", icon=ft.icons.THERMOSTAT, width=200, keyboard_type=ft.KeyboardType.NUMBER)
-    tf_res_min     = ft.TextField(label="Tempo de residência (min)", icon=ft.icons.TIMER, width=200, keyboard_type=ft.KeyboardType.NUMBER)
-    tf_notes_bc    = ft.TextField(label="Notas (opcional)", icon=ft.icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
+    tf_pyroC       = ft.TextField(label="Temperatura de pirólise (°C)", icon=Icons.THERMOSTAT, width=200, keyboard_type=ft.KeyboardType.NUMBER)
+    tf_res_min     = ft.TextField(label="Tempo de residência (min)", icon=Icons.TIMER, width=200, keyboard_type=ft.KeyboardType.NUMBER)
+    tf_notes_bc    = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
 
     # ---------------- Campos BIOMASS ----------------
-    tf_bm_name   = ft.TextField(label="Nome da biomassa", icon=ft.icons.ECO, width=420)
-    tf_origin    = ft.TextField(label="Origem", icon=ft.icons.LOCATION_ON, width=420)
+    tf_bm_name   = ft.TextField(label="Nome da biomassa", icon=Icons.ECO, width=420)
+    tf_origin    = ft.TextField(label="Origem", icon=Icons.LOCATION_ON, width=420)
 
     tf_coll_date = ft.TextField(
         label="Data de coleta",
-        icon=ft.icons.EVENT,
+        icon=Icons.EVENT,
         width=260,
         read_only=True,
         hint_text="YYYY-MM-DD"
@@ -346,9 +353,9 @@ def main(page: ft.Page):
         last_date=dt.date(2100,12,31),
         on_change=lambda e: (setattr(tf_coll_date, "value", str(e.control.value) or ""), page.update())
     )
-    tf_coll_date.suffix = ft.IconButton(icon=ft.icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_coll))
+    tf_coll_date.suffix = ft.IconButton(icon=Icons.CALENDAR_MONTH, on_click=lambda e: page.open(dp_coll))
 
-    tf_notes_bm  = ft.TextField(label="Notas (opcional)", icon=ft.icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
+    tf_notes_bm  = ft.TextField(label="Notas (opcional)", icon=Icons.NOTE, multiline=True, min_lines=2, max_lines=4, width=900)
 
     # ---------- Prévia / Conteúdo e Zoom ----------
     img_preview = ft.Image(
@@ -364,7 +371,7 @@ def main(page: ft.Page):
 
     zoom_row = ft.Row(
         [
-            ft.Icon(ft.icons.ZOOM_IN_MAP),
+            ft.Icon(Icons.ZOOM_IN_MAP),
             ft.Text("Zoom"),
             ft.Container(content=zoom_slider, expand=1),
         ],
@@ -508,7 +515,7 @@ def main(page: ft.Page):
     biochar_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.SCIENCE, color=Colors.BLUE), ft.Text("Biochar", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(Icons.SCIENCE, color=Colors.BLUE), ft.Text("Biochar", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.ResponsiveRow([
                     ft.Container(tf_sample_name, col={"xs":12,"md":6}),
@@ -528,7 +535,7 @@ def main(page: ft.Page):
     biomass_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.GRAIN, color=Colors.BLUE), ft.Text("Biomassa", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(Icons.GRAIN, color=Colors.BLUE), ft.Text("Biomassa", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.ResponsiveRow([
                     ft.Container(tf_bm_name,   col={"xs":12,"md":6}),
@@ -542,9 +549,9 @@ def main(page: ft.Page):
     )
 
     # Ações
-    btn_generate = ft.ElevatedButton("Gerar prévia", icon=ft.icons.QR_CODE_2, on_click=generate_preview)
-    btn_save     = ft.OutlinedButton("Salvar PNG", icon=ft.icons.DOWNLOAD, on_click=save_png)
-    btn_copy     = ft.OutlinedButton("Copiar conteúdo", icon=ft.icons.CONTENT_COPY, on_click=copy_qr_content)
+    btn_generate = ft.ElevatedButton("Gerar prévia", icon=Icons.QR_CODE_2, on_click=generate_preview)
+    btn_save     = ft.OutlinedButton("Salvar PNG", icon=Icons.DOWNLOAD, on_click=save_png)
+    btn_copy     = ft.OutlinedButton("Copiar conteúdo", icon=Icons.CONTENT_COPY, on_click=copy_qr_content)
 
     actions = ft.Row([dd_format, btn_generate, btn_save, btn_copy], spacing=12)
 
@@ -552,7 +559,7 @@ def main(page: ft.Page):
     preview_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.IMAGE, color=Colors.BLUE), ft.Text("Prévia", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(Icons.IMAGE, color=Colors.BLUE), ft.Text("Prévia", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.Container(
                     img_preview,
@@ -561,10 +568,10 @@ def main(page: ft.Page):
                     border_radius=10,
                     shadow=ft.BoxShadow(blur_radius=8, color=Colors.with_opacity(0.2, Colors.BLACK)),
                 ),
-                #ft.Row([ft.Icon(ft.icons.ZOOM_IN_MAP), ft.Text("Zoom"), zoom_slider], alignment=ft.MainAxisAlignment.START),
+                #ft.Row([ft.Icon(Icons.ZOOM_IN_MAP), ft.Text("Zoom"), zoom_slider], alignment=ft.MainAxisAlignment.START),
                 zoom_row,
                 ft.Divider(),
-                ft.Row([ft.Icon(ft.icons.DATA_OBJECT), ft.Text("Conteúdo do QR", size=14, weight=ft.FontWeight.W_600)]),
+                ft.Row([ft.Icon(Icons.DATA_OBJECT), ft.Text("Conteúdo do QR", size=14, weight=ft.FontWeight.W_600)]),
                 qr_content_out
             ], tight=True),
             padding=16,
