@@ -228,11 +228,11 @@ def main(page: ft.Page):
 
     # Estilização da "bolinha" do botão e ícone (ciano no claro, âmbar no escuro)
     def update_theme_button():
-        circle_bg = ft.colors.AMBER_400 if not is_dark else ft.colors.CYAN_400
-        icon_col  = ft.colors.BLACK
+        circle_bg = ft.Colors.AMBER_400 if not is_dark else ft.Colors.CYAN_400
+        icon_col  = ft.Colors.BLACK
         theme_btn.style = ft.ButtonStyle(
             bgcolor={ft.MaterialState.DEFAULT: circle_bg},
-            overlay_color={ft.MaterialState.HOVERED: ft.colors.with_opacity(0.12, ft.colors.WHITE)},
+            overlay_color={ft.MaterialState.HOVERED: ft.colors.with_opacity(0.12, ft.Colors.WHITE)},
             shape=ft.CircleBorder(),
             padding=12,
             mouse_cursor=ft.MouseCursor.CLICK,
@@ -378,7 +378,7 @@ def main(page: ft.Page):
         tf_origin.value  = _titlecase(tf_origin.value or "")
 
     def snack(msg, ok=False, warn=False):
-        color = ft.colors.GREEN if ok else ft.colors.AMBER if warn else ft.colors.RED
+        color = ft.Colors.GREEN if ok else ft.Colors.AMBER if warn else ft.Colors.RED
         page.snack_bar = ft.SnackBar(content=ft.Text(msg), bgcolor=color)
         page.snack_bar.open = True
         page.update()
@@ -494,7 +494,7 @@ def main(page: ft.Page):
     biochar_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.SCIENCE, color=ft.colors.BLUE), ft.Text("Biochar", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(ft.icons.SCIENCE, color=ft.Colors.BLUE), ft.Text("Biochar", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.ResponsiveRow([
                     ft.Container(tf_sample_name, col={"xs":12,"md":6}),
@@ -514,7 +514,7 @@ def main(page: ft.Page):
     biomass_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.GRAIN, color=ft.colors.BLUE), ft.Text("Biomassa", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(ft.icons.GRAIN, color=ft.Colors.BLUE), ft.Text("Biomassa", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.ResponsiveRow([
                     ft.Container(tf_bm_name,   col={"xs":12,"md":6}),
@@ -538,14 +538,14 @@ def main(page: ft.Page):
     preview_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
-                ft.Row([ft.Icon(ft.icons.IMAGE, color=ft.colors.BLUE), ft.Text("Prévia", size=16, weight=ft.FontWeight.BOLD)]),
+                ft.Row([ft.Icon(ft.icons.IMAGE, color=ft.Colors.BLUE), ft.Text("Prévia", size=16, weight=ft.FontWeight.BOLD)]),
                 ft.Divider(),
                 ft.Container(
                     img_preview,
-                    bgcolor=ft.colors.WHITE,
+                    bgcolor=ft.Colors.WHITE,
                     padding=10,
                     border_radius=10,
-                    shadow=ft.BoxShadow(blur_radius=8, color=ft.colors.with_opacity(0.2, ft.colors.BLACK)),
+                    shadow=ft.BoxShadow(blur_radius=8, color=ft.Colors.with_opacity(0.2, ft.Colors.BLACK)),
                 ),
                 #ft.Row([ft.Icon(ft.icons.ZOOM_IN_MAP), ft.Text("Zoom"), zoom_slider], alignment=ft.MainAxisAlignment.START),
                 zoom_row,
@@ -587,3 +587,4 @@ if __name__ == "__main__":
     import os
     port = int(os.getenv("PORT", "8080"))
     ft.app(target=main, view=ft.AppView.WEB_BROWSER, host="0.0.0.0", port=port)
+
