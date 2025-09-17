@@ -384,7 +384,7 @@ def main(page: ft.Page):
     current_png_bytes: bytes | None = None
     current_png_name: str = "label.png"
 
-    file_save = ft.FilePicker(on_result=lambda e: None)
+    file_save = ft.FilePicker()  # web: usaremos save_file(data=...)
     page.overlay.extend([file_save, dp_prod, dp_coll])
 
     # Helpers
@@ -478,19 +478,41 @@ def main(page: ft.Page):
         if not current_png_bytes:
             generate_preview()
             if not current_png_bytes:
+                snack("Gere a prévia antes de salvar.")
                 return
 
-        def _save_result(res: ft.FilePickerResultEvent):
-            if not res.path:
+        try:
+            # Web: dispara download direto pelo navegador
+            if str(getattr(page, "platform", "")).lower() == "web":
+                file_save.save_file(
+                    file_name=current_png_name,
+                    data=current_png_bytes,
+                    mime_type="image/png",
+                )
                 return
+
+            # Desktop: abre diálogo, depois grava no caminho escolhido
+            def _save_result(res: ft.FilePickerResultEvent):
+                if not res.path:
+                    return
+                try:
+                    Path(res.path).write_bytes(current_png_bytes)
+                    snack(f"Salvo em: {res.path}", ok=True)
+                except Exception as ex:
+                    snack(f"Erro ao salvar: {ex}")
+
+            file_save.on_result = _save_result
+            file_save.save_file(file_name=current_png_name, allowed_extensions=["png"])
+
+        except Exception as ex:
+            # Fallback absoluto para web se o browser bloquear o download
             try:
-                Path(res.path).write_bytes(current_png_bytes)
-                snack(f"Salvo em: {res.path}", ok=True)
-            except Exception as ex:
-                snack(f"Erro ao salvar: {ex}")
+                b64 = base64.b64encode(current_png_bytes).decode("ascii")
+                page.launch_url(f"data:image/png;base64,{b64}")
+                snack("Abrindo PNG em nova aba para você salvar manualmente.", warn=True)
+            except Exception:
+                snack(f"Falha no download: {ex}")
 
-        file_save.on_result = _save_result
-        file_save.save_file(file_name=current_png_name, allowed_extensions=["png"])
 
     def copy_qr_content(e=None):
         if not qr_content_out.value:
