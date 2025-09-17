@@ -1,0 +1,1 @@
+web: python QrCode_Flet.py
